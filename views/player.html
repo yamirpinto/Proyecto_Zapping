@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conejote</title>
+  <style>
+      body {
+      font-family: "Stolzl";
+      background-color: #16181c;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      font-family: "Stolzl";
+      font-weight: 700;
+      font-size: 2.5rem;
+      color: white;
+      text-align: center;
+    }
+
+    #video-container {
+      display:flex;
+      position: relative;
+      justify-content: space-evenly;
+      max-width: 800px; 
+      margin: 0 auto; 
+    }
+    #video-player {
+      width: 100%; 
+      max-height: 500px; 
+    }
+    #logo-image {
+      display: block;
+      margin: 0 auto 20px;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <img id="logo-image"
+      src="https://yt3.googleusercontent.com/ytc/AGIKgqM-DZRmf2yBhsd4FkZoc3sbEymwNXt4R0SEaZwyig=s900-c-k-c0x00ffffff-no-rj"
+      alt="Logo">
+    <h1>Video del Conejito y la Ardilla Mala</h1>
+  <div id="video-container">
+    <video id="video-player" autoplay controls></video>
+  </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.min.js"></script>
+  <script>
+    window.onload = function () {
+      
+      const authToken = localStorage.getItem('authToken');
+
+      // Verifica si el usuario está autenticado antes de cargar el video
+      if (authToken) {
+        const videoUrl = '/livestream';
+        const videoPlayer = document.getElementById('video-player');
+
+        // Verifica si HLS es compatible con el navegador
+        if (Hls.isSupported()) {
+          var hls = new Hls();
+          hls.loadSource(videoUrl);
+          hls.attachMedia(videoPlayer);
+          hls.on(Hls.Events.MANIFEST_PARSED, function () {
+            videoPlayer.play();
+          });
+        }
+        // HLS no es compatible con el navegador
+        else if (videoPlayer.canPlayType('application/vnd.apple.mpegurl')) {
+          videoPlayer.src = videoUrl;
+          videoPlayer.addEventListener('canplay', function () {
+            videoPlayer.play();
+          });
+        }
+      } else {
+        // Si el usuario no está autenticado, de vuelta al login!
+        window.location.href = '/login';
+      }
+    }
+  window.addEventListener('beforeunload', function () {
+  localStorage.removeItem('authToken');
+  });
+  </script>
+</body>
+
+</html>
